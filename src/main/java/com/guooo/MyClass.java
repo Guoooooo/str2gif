@@ -1,8 +1,10 @@
 package com.guooo;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -25,8 +27,14 @@ public class MyClass {
         while (range > 0 - 30) {
             BufferedImage bufferedImage = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
             Graphics graphics = bufferedImage.getGraphics();
-            graphics.setColor(Color.BLUE);
+            Graphics2D g2d = (Graphics2D) graphics;
+            AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
+                    1f);
+            g2d.setComposite(ac);
             graphics.fillRect(0, 0, imageWidth, imageHeight);
+            AlphaComposite ac2 = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
+                    1f);
+            g2d.setComposite(ac2);
             graphics.setColor(Color.RED);
             graphics.setFont(new Font("宋体", Font.PLAIN, 30));
             graphics.drawString(string, imageWidth - count * 30, 5 + 30);
