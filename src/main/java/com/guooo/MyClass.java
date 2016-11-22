@@ -3,7 +3,6 @@ package com.guooo;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -14,7 +13,7 @@ import javax.imageio.ImageIO;
 
 public class MyClass {
     public static void main(String[] args) throws IOException {
-        getGif("你去死吧死吧死吧", "你个铺盖恒阿灿", "啊啊啊啊啊");
+        getGif("一二三四五六七八九十", "一二三四五六", "一二三四五六七");
     }
 
 
@@ -29,30 +28,30 @@ public class MyClass {
             return;
 
         ArrayList<String> strings = new ArrayList<>();
-        ArrayList<Integer> indentCounts = new ArrayList<>();
+        ArrayList<Integer> indentAmounts = new ArrayList<>();
         int maxLength = 0;
-        int count = 0;
+        int strCount = 0;
         for (String string : strs) {
             if (string == null || string.equals("")) {
                 return;
             }
 
             int length = string.length();
-            int indentCount = 0;
-            if (count >= FIRST_LINE) {
-                indentCount = (count - FIRST_LINE) * INDENT;
+            int indentAmount;
+            if (strCount >= FIRST_LINE) {
+                indentAmount = (strCount - FIRST_LINE) * INDENT;
             } else {
-                indentCount = (strs.length - (FIRST_LINE - count)) * INDENT;
+                indentAmount = (strs.length - (FIRST_LINE - strCount)) * INDENT;
             }
 
-            length = indentCount + length;
+            length = indentAmount + length;
             if (length > maxLength) {
                 maxLength = length;
             }
-            count++;
+            strCount++;
 
             strings.add(string);
-            indentCounts.add(indentCount);
+            indentAmounts.add(indentAmount);
         }
 
         int imageWidth = maxLength * FONT_SIZE;//图片长度
@@ -63,31 +62,33 @@ public class MyClass {
         int imageCount = 0;
         while (range > -FONT_SIZE) {
             BufferedImage bufferedImage = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
-            Graphics graphics = bufferedImage.getGraphics();
-            Graphics2D g2d = (Graphics2D) graphics;
-            AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
-                    1f);
-            g2d.setComposite(ac);
+            Graphics2D graphics = (Graphics2D) bufferedImage.getGraphics();
+            AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0f);
+            graphics.setComposite(ac);
             graphics.fillRect(0, 0, imageWidth, imageHeight);
-            AlphaComposite ac2 = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
-                    1f);
-            g2d.setComposite(ac2);
+            ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f);
+            graphics.setComposite(ac);
             //绘制字符串
             for (int i = 0; i < strings.size(); i++) {
-                graphics.setColor(Color.RED);
+//                if (i == 0)
+                graphics.setColor(Color.black);
+//                if (i == 1)
+//                    graphics.setColor(Color.GREEN);
+//                if (i == 2)
+//                    graphics.setColor(Color.YELLOW);
                 graphics.setFont(new Font("宋体", Font.PLAIN, 30));
-                graphics.drawString(strings.get(i), imageWidth + (indentCounts.get(i) - imageCount) * FONT_SIZE, (FONT_SIZE + 2 * LINE_GAP) * (i + 1) - LINE_GAP);
+                graphics.drawString(strings.get(i), imageWidth + (indentAmounts.get(i) - imageCount) * FONT_SIZE, (imageHeight / strs.length * (i + 1)) - LINE_GAP);
             }
-            ImageIO.write(bufferedImage, "png", new File("haha" + (imageCount + 1) + ".png"));
-            bufferedImages.add(bufferedImage);
             graphics.dispose();
+            ImageIO.write(bufferedImage, "png", new File("image" + (imageCount + 1) + ".png"));
+            bufferedImages.add(bufferedImage);
             range = range - FONT_SIZE;
             imageCount++;
         }
-
         AnimatedGifEncoder e = new AnimatedGifEncoder();
+        e.setTransparent(new Color(0, 255, 255, 255));
         e.setRepeat(0);
-        e.start("laoma.gif");
+        e.start("gifImage.gif");
         for (BufferedImage bufferedImage : bufferedImages) {
             e.setDelay(100);
             e.addFrame(bufferedImage);
