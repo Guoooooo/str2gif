@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -179,6 +180,37 @@ public class AnimatedGifEncoder {
     }
 
     /**
+     * 获取gif图片bytes数组的finish方法;
+     *
+     * @return
+     */
+    public byte[] finishForBytes() {
+        byte[] bytes = null;
+        if (!started)
+            return bytes;
+        started = false;
+        try {
+            out.write(0x3b); // gif trailer
+            out.flush();
+            bytes = ((ByteArrayOutputStream) out).toByteArray();
+            if (closeStream) {
+                out.close();
+            }
+        } catch (IOException e) {
+
+        }
+        transIndex = 0;
+        out = null;
+        image = null;
+        pixels = null;
+        indexedPixels = null;
+        colorTab = null;
+        closeStream = false;
+        firstFrame = true;
+        return bytes;
+    }
+
+    /**
      * Sets frame rate in frames per second.  Equivalent to
      * <code>setDelay(1000/fps)</code>.
      *
@@ -238,6 +270,23 @@ public class AnimatedGifEncoder {
         try {
             writeString("GIF89a"); // header
         } catch (IOException e) {
+            ok = false;
+        }
+        return started = ok;
+    }
+
+    /**
+     * 获取gif图片bytes数组的start方法;
+     *
+     * @return
+     */
+    public boolean startForBytes() {
+        boolean ok;
+        try {
+            out = new ByteArrayOutputStream();
+            ok = start(out);
+            closeStream = true;
+        } catch (Exception e) {
             ok = false;
         }
         return started = ok;
